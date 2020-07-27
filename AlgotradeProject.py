@@ -27,12 +27,11 @@ import matplotlib.pyplot as plt
 def returnsDiffrence(selected, portfolio, periods_stocks_prices):
         real_profit_percentage = { "SPY": 0.05 , "QQQ": -0.1}
         portfolio_percentage =  { "SPY": 0.3 , "QQQ": 0.7}
-        selected_stocks=["SPY" , "QQQ"]
         returns= portfolio["Returns"]
 
         profitByRobo=0
-        for stock in selected_stocks:
-            profitByRobo=profitByRobo+portfolio_percentage[stock]*real_profit_percentage[stock]
+        for stock in selected:
+            profitByRobo=profitByRobo+portfolio[stock + " Weight"]*periods_stocks_prices[stock]['difference']
 
         return returns-profitByRobo
 
@@ -211,7 +210,7 @@ for period in test_periods:
         period_info = periods_portfolios[period_key]
         for portfolio in period_info:
            row = df_.loc[period_key]
-           row[portfolio] = returnsDiffrence(selected, period_info[portfolio], periods_stocks_prices)
+           row[portfolio] = returnsDiffrence(selected, period_info[portfolio], periods_stocks_prices[period_key])
 
 
 
