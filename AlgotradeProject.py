@@ -180,8 +180,14 @@ for period in test_periods:
                     bbox=dict(facecolor='green', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
                     wrap=True)
 
+    for period in periods_stocks:
+        for mystock in periods_stocks[period]:
+                difference = (periods_stocks[period][mystock]['end_val'] - periods_stocks[period][mystock]['start_val']) / periods_stocks[period][mystock]['start_val']
+                periods_stocks[period][mystock]["difference"]= difference
+
+
     plt.show()
- 
+
 
 
     print(periods_stocks)
