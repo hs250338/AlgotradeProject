@@ -18,6 +18,7 @@ import yfinance as yf
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # selected_stocks-all stock names
 # returns- returns in percentage by robo.
 # portfolio_percentage- split by percentage of investment
@@ -25,16 +26,17 @@ import matplotlib.pyplot as plt
 # return the difference between Robo' Prediction and reality
 
 def returnsDiffrence(selected, portfolio, periods_stocks_prices):
-        real_profit_percentage = { "SPY": 0.05 , "QQQ": -0.1}
-        portfolio_percentage =  { "SPY": 0.3 , "QQQ": 0.7}
-        selected_stocks=["SPY" , "QQQ"]
-        returns= portfolio["Returns"]
+    real_profit_percentage = {"SPY": 0.05, "QQQ": -0.1}
+    portfolio_percentage = {"SPY": 0.3, "QQQ": 0.7}
+    selected_stocks = ["SPY", "QQQ"]
+    returns = portfolio["Returns"]
 
-        profitByRobo=0
-        for stock in selected_stocks:
-            profitByRobo=profitByRobo+portfolio_percentage[stock]*real_profit_percentage[stock]
+    profitByRobo = 0
+    for stock in selected_stocks:
+        profitByRobo = profitByRobo + portfolio_percentage[stock] * real_profit_percentage[stock]
 
-        return returns-profitByRobo
+    return returns - profitByRobo
+
 
 test_periods = [
     {"start_year": '2005-1-1', "end_year": '2008-1-1', 'predict_year': '2009-1-1'},
@@ -184,12 +186,22 @@ for period in test_periods:
     # plt.show()
     # print(periods_stocks)
     # print(periods_portfolios)
-
+    """
+    #################################################
+    Testing Robo-Adviser Project 
+    
+    - performing analysis on a few periods and 7 different stocks 
+    - finding the differences in Robo-Adviser Returns prediction for each portfolio and make an analysis of the results 
+    - finding the differences in Robo-Adviser total prediction returns  for all portfolios and make an analysis 
+    #################################################
+    
+    """
     # find the  prices diff from the beginning of a period and the end
     for period in periods_stocks_prices:
         for mystock in periods_stocks_prices[period]:
-                difference = (periods_stocks_prices[period][mystock]['end_val'] - periods_stocks_prices[period][mystock]['start_val']) / periods_stocks_prices[period][mystock]['start_val']
-                periods_stocks_prices[period][mystock]["difference"]= difference
+            difference = (periods_stocks_prices[period][mystock]['end_val'] - periods_stocks_prices[period][mystock][
+                'start_val']) / periods_stocks_prices[period][mystock]['start_val']
+            periods_stocks_prices[period][mystock]["difference"] = difference
     # init data frame of real returns diff
     """
         Period / Portfolio    |     safest   |   max_returns   |   sharp 
@@ -204,17 +216,14 @@ for period in test_periods:
     df_ = pd.DataFrame(index=index, columns=columns)
     df_ = df_.fillna(0)  # with 0s rather than NaNs
 
-
     # get periods
-    for period_key in index :
+    for period_key in index:
         # key = period_key['start_year'] + '->' + period_key['end_year']
         period_info = periods_portfolios[period_key]
         for portfolio in period_info:
-           row = df_.loc[period_key]
-           row[portfolio] = returnsDiffrence(selected, period_info[portfolio], periods_stocks_prices)
-
+            row = df_.loc[period_key]
+            row[portfolio] = returnsDiffrence(selected, period_info[portfolio], periods_stocks_prices[period_key])
 
 
 def realProfitPercentage():
     return
-
