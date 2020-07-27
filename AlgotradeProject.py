@@ -24,11 +24,11 @@ import matplotlib.pyplot as plt
 # real_profit_percentage- difference between end and start of stocks value
 # return the difference between Robo' Prediction and reality
 
-def returnsDiffrence(selected_stocks,returns, portfolio_percentage,real_profit_percentage):
+def returnsDiffrence(selected, portfolio, periods_stocks_prices):
         real_profit_percentage = { "SPY": 0.05 , "QQQ": -0.1}
         portfolio_percentage =  { "SPY": 0.3 , "QQQ": 0.7}
         selected_stocks=["SPY" , "QQQ"]
-        returns= 0.2
+        returns= portfolio["Returns"]
 
         profitByRobo=0
         for stock in selected_stocks:
@@ -38,13 +38,13 @@ def returnsDiffrence(selected_stocks,returns, portfolio_percentage,real_profit_p
 
 test_periods = [
     {"start_year": '2005-1-1', "end_year": '2008-1-1', 'predict_year': '2009-1-1'},
-    {"start_year":'2008-1-1' , "end_year":'2011-1-1','predict_year': '2012-1-1'},
-    {"start_year":'2011-1-1' , "end_year":'2014-1-1','predict_year': '2015-1-1'},
-    {"start_year":'2014-1-1' , "end_year":'2017-1-1','predict_year': '2018-1-1'},
-    {"start_year":'2017-1-1' , "end_year":'2020-1-1','predict_year': '2021-7-1'}
+    # {"start_year":'2008-1-1' , "end_year":'2011-1-1','predict_year': '2012-1-1'},
+    # {"start_year":'2011-1-1' , "end_year":'2014-1-1','predict_year': '2015-1-1'},
+    # {"start_year":'2014-1-1' , "end_year":'2017-1-1','predict_year': '2018-1-1'},
+    # {"start_year":'2017-1-1' , "end_year":'2020-1-1','predict_year': '2021-7-1'}
 ]
 
-periods_stocks = {}
+periods_stocks_prices = {}
 periods_portfolios = {}
 
 for period in test_periods:
@@ -69,7 +69,7 @@ for period in test_periods:
         # get the price of each stock at the end of the tested period and one year after
         predict_price = pdr.get_data_yahoo(stock, end_year, prediction_year)['Adj Close']
         stocks_prices[stock] = {'start_val': predict_price[0], 'end_val': predict_price[len(predict_price) - 1]}
-    periods_stocks[period['start_year'] + '->' + period['end_year']] = stocks_prices
+    periods_stocks_prices[period['start_year'] + '->' + period['end_year']] = stocks_prices
     # End Insert Adj Close To DataBase
 
     import pandas as pd
@@ -167,9 +167,10 @@ for period in test_periods:
 
     with pd.option_context('display.float_format', '%{:,.2f}'.format):
         # keep for each period of prediction all the three portfolios data
-        periods_portfolios[period['start_year'] + '->' + period['end_year']] = {'max_returns':df.loc[red_num[0]].multiply(multseries),
-                                                                                'safest':df.loc[yellow_num[0]].multiply(multseries) ,
-                                                                                'sharp': df.loc[green_num[0]].multiply(multseries)}
+        periods_portfolios[period['start_year'] + '->' + period['end_year']] = {
+            'max_returns': df.loc[red_num[0]].multiply(multseries),
+            'safest': df.loc[yellow_num[0]].multiply(multseries),
+            'sharp': df.loc[green_num[0]].multiply(multseries)}
         plt.figtext(0.2, 0.15, "Max returns Porfolio: \n" + df.loc[red_num[0]].multiply(multseries).to_string(),
                     bbox=dict(facecolor='red', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
                     wrap=True)
@@ -180,18 +181,37 @@ for period in test_periods:
                     bbox=dict(facecolor='green', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
                     wrap=True)
 
-    for period in periods_stocks:
-        for mystock in periods_stocks[period]:
-                difference = (periods_stocks[period][mystock]['end_val'] - periods_stocks[period][mystock]['start_val']) / periods_stocks[period][mystock]['start_val']
-                periods_stocks[period][mystock]["difference"]= difference
+    # plt.show()
+    # print(periods_stocks)
+    # print(periods_portfolios)
+
+    # find the  prices diff from the beginning of a period and the end
+    for period in periods_stocks_prices:
+        for mystock in periods_stocks_prices[period]:
+                difference = (periods_stocks_prices[period][mystock]['end_val'] - periods_stocks_prices[period][mystock]['start_val']) / periods_stocks_prices[period][mystock]['start_val']
+                periods_stocks_prices[period][mystock]["difference"]= difference
+    # init data frame of real returns diff
+    """
+        Period / Portfolio    |     safest   |   max_returns   |   sharp 
+        
+        2008-1-1 -> 20012-1-1       +0.5%            -0.7%          +7.5%   
+            ...
+            ...
+            
+    """
+    index = periods_stocks_prices.keys()
+    columns = ['max_returns', 'safest', 'sharp']
+    df_ = pd.DataFrame(index=index, columns=columns)
+    df_ = df_.fillna(0)  # with 0s rather than NaNs
 
 
-    plt.show()
-
-
-
-    print(periods_stocks)
-    print(periods_portfolios)
+    # get periods
+    for period_key in index :
+        # key = period_key['start_year'] + '->' + period_key['end_year']
+        period_info = periods_portfolios[period_key]
+        for portfolio in period_info:
+           row = df_.loc[period_key]
+           row[portfolio] = returnsDiffrence(selected, period_info[portfolio], periods_stocks_prices)
 
 
 
