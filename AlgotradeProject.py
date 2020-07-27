@@ -18,6 +18,23 @@ import yfinance as yf
 import numpy as np
 import matplotlib.pyplot as plt
 
+# selected_stocks-all stock names
+# returns- returns in percentage by robo.
+# portfolio_percentage- split by percentage of investment
+# real_profit_percentage- difference between end and start of stocks value
+# return the difference between Robo' Prediction and reality
+
+def returnsDiffrence(selected_stocks,returns, portfolio_percentage,real_profit_percentage):
+        real_profit_percentage = { "SPY": 0.05 , "QQQ": -0.1}
+        portfolio_percentage =  { "SPY": 0.3 , "QQQ": 0.7}
+        selected_stocks=["SPY" , "QQQ"]
+        returns= 0.2
+
+        profitByRobo=0
+        for stock in selected_stocks:
+            profitByRobo=profitByRobo+portfolio_percentage[stock]*real_profit_percentage[stock]
+
+        return returns-profitByRobo
 
 test_periods = [
     {"start_year": '2005-1-1', "end_year": '2008-1-1', 'predict_year': '2009-1-1'},
@@ -162,6 +179,16 @@ for period in test_periods:
         plt.figtext(0.7, 0.15, "Sharpe  Portfolio: \n" + df.loc[green_num[0]].multiply(multseries).to_string(),
                     bbox=dict(facecolor='green', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
                     wrap=True)
+
     plt.show()
+ 
+
+
     print(periods_stocks)
     print(periods_portfolios)
+
+
+
+def realProfitPercentage():
+    return
+
