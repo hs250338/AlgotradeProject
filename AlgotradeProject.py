@@ -26,16 +26,11 @@ import matplotlib.pyplot as plt
 # return the difference between Robo' Prediction and reality
 
 def returnsDiffrence(selected, portfolio, periods_stocks_prices):
-    real_profit_percentage = {"SPY": 0.05, "QQQ": -0.1}
-    portfolio_percentage = {"SPY": 0.3, "QQQ": 0.7}
-    selected_stocks = ["SPY", "QQQ"]
-    returns = portfolio["Returns"]
+        returns= portfolio["Returns"]
 
-    profitByRobo = 0
-    for stock in selected_stocks:
-        profitByRobo = profitByRobo + portfolio_percentage[stock] * real_profit_percentage[stock]
-
-    return returns - profitByRobo
+        profitByRobo=0
+        for stock in selected:
+            profitByRobo=profitByRobo+portfolio[stock + " Weight"]*periods_stocks_prices[stock]['difference']
 
 
 test_periods = [
@@ -221,9 +216,8 @@ for period in test_periods:
         # key = period_key['start_year'] + '->' + period_key['end_year']
         period_info = periods_portfolios[period_key]
         for portfolio in period_info:
+
             row = df_.loc[period_key]
             row[portfolio] = returnsDiffrence(selected, period_info[portfolio], periods_stocks_prices[period_key])
 
 
-def realProfitPercentage():
-    return
