@@ -18,27 +18,17 @@ import yfinance as yf
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-# selected_stocks-all stock names
-# returns- returns in percentage by robo.
-# portfolio_percentage- split by percentage of investment
-# real_profit_percentage- difference between end and start of stocks value
-# return the difference between Robo' Prediction and reality
-
-def returnsDiffrence(selected, portfolio, periods_stocks_prices):
-        returns= portfolio["Returns"]
-
-        profitByRobo=0
-        for stock in selected:
-            profitByRobo=profitByRobo+portfolio[stock + " Weight"]*periods_stocks_prices[stock]['difference']
-
-
 test_periods = [
     {"start_year": '2005-1-1', "end_year": '2008-1-1', 'predict_year': '2009-1-1'},
-    # {"start_year":'2008-1-1' , "end_year":'2011-1-1','predict_year': '2012-1-1'},
-    # {"start_year":'2011-1-1' , "end_year":'2014-1-1','predict_year': '2015-1-1'},
-    # {"start_year":'2014-1-1' , "end_year":'2017-1-1','predict_year': '2018-1-1'},
-    # {"start_year":'2017-1-1' , "end_year":'2020-1-1','predict_year': '2021-7-1'}
+    {"start_year": '2006-1-1', "end_year": '2009-1-1', 'predict_year': '2010-1-1'},
+    {"start_year": '2007-1-1', "end_year": '2010-1-1', 'predict_year': '2011-1-1'},
+    {"start_year": '2009-1-1', "end_year": '2012-1-1', 'predict_year': '2013-1-1'},
+    {"start_year":'2008-1-1' , "end_year":'2011-1-1','predict_year': '2012-1-1'},
+    {"start_year":'2011-1-1' , "end_year":'2014-1-1','predict_year': '2015-1-1'},
+    {"start_year":'2012-1-1' , "end_year":'2015-1-1','predict_year': '2016-1-1'},
+    {"start_year":'2015-1-1' , "end_year":'2018-1-1','predict_year': '2019-1-1'},
+    {"start_year":'2014-1-1' , "end_year":'2017-1-1','predict_year': '2018-1-1'},
+    {"start_year":'2016-7-1' , "end_year":'2019-7-1','predict_year': '2020-7-1'}
 ]
 
 periods_stocks_prices = {}
@@ -181,6 +171,7 @@ for period in test_periods:
     # plt.show()
     # print(periods_stocks)
     # print(periods_portfolios)
+
     """
     #################################################
     Testing Robo-Adviser Project 
@@ -191,33 +182,66 @@ for period in test_periods:
     #################################################
     
     """
-    # find the  prices diff from the beginning of a period and the end
-    for period in periods_stocks_prices:
-        for mystock in periods_stocks_prices[period]:
-            difference = (periods_stocks_prices[period][mystock]['end_val'] - periods_stocks_prices[period][mystock][
-                'start_val']) / periods_stocks_prices[period][mystock]['start_val']
-            periods_stocks_prices[period][mystock]["difference"] = difference
-    # init data frame of real returns diff
-    """
-        Period / Portfolio    |     safest   |   max_returns   |   sharp 
+
+"""
+    # selected_stocks-all stock names
+    # returns- returns in percentage by robo.
+    # portfolio_percentage- split by percentage of investment
+    # real_profit_percentage- difference between end and start of stocks value
+    # return the difference between Robo' Prediction and reality
+"""
+
+
+def returnsDiffrence(selected, portfolio, periods_stocks_prices):
+    returns = portfolio["Returns"]
+
+    real_profit = 0.0
+    for stock in selected:
+        real_profit = real_profit + ( portfolio[stock + " Weight"] * periods_stocks_prices[stock]['difference']- portfolio[stock + " Weight"] )
+    return returns - real_profit
+
+
+
+# find the  prices diff from the beginning of a period and the end
+for period in periods_stocks_prices:
+    for mystock in periods_stocks_prices[period]:
+        difference = 1.0 + (periods_stocks_prices[period][mystock]['end_val'] - periods_stocks_prices[period][mystock][
+            'start_val']) / periods_stocks_prices[period][mystock]['start_val']
+        periods_stocks_prices[period][mystock]["difference"] = difference
+# init data frame of real returns diff
+"""
+    Period / Portfolio    |     safest   |   max_returns   |   sharp 
+    
+    2008-1-1 -> 20012-1-1       +0.5%            -0.7%          +7.5%   
+        ...
+        ...
         
-        2008-1-1 -> 20012-1-1       +0.5%            -0.7%          +7.5%   
-            ...
-            ...
-            
-    """
-    index = periods_stocks_prices.keys()
-    columns = ['max_returns', 'safest', 'sharp']
-    df_ = pd.DataFrame(index=index, columns=columns)
-    df_ = df_.fillna(0)  # with 0s rather than NaNs
+"""
+index = periods_stocks_prices.keys()
+columns = ['max_returns', 'safest', 'sharp']
+df_ = pd.DataFrame(index=index, columns=columns)
+df_ = df_.fillna(0.0)  # with 0s rather than NaNs
 
-    # get periods
-    for period_key in index:
-        # key = period_key['start_year'] + '->' + period_key['end_year']
-        period_info = periods_portfolios[period_key]
-        for portfolio in period_info:
+# get periods
+for period_key in index:
+    # key = period_key['start_year'] + '->' + period_key['end_year']
+    period_info = periods_portfolios[period_key]
+    for portfolio in period_info:
+        row = df_.loc[period_key]
+        row[portfolio] = returnsDiffrence(selected, period_info[portfolio], periods_stocks_prices[period_key])
 
-            row = df_.loc[period_key]
-            row[portfolio] = returnsDiffrence(selected, period_info[portfolio], periods_stocks_prices[period_key])
+"""
+#################
+Results analysis 
+#################
+"""
 
+print(df_)
+print("mean safest: " + str(df_["safest"].mean()))
+print("std safest: " + str(df_["safest"].std()))
 
+print("mean sharp: " + str(df_["sharp"].mean()))
+print("std sharp: " + str(df_["sharp"].std()))
+
+print("mean max_returns: " + str(df_["max_returns"].mean()))
+print("std max_returns: " + str(df_["max_returns"].std()))
