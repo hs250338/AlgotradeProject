@@ -22,13 +22,13 @@ test_periods = [
     {"start_year": '2005-1-1', "end_year": '2008-1-1', 'predict_year': '2009-1-1'},
     {"start_year": '2006-1-1', "end_year": '2009-1-1', 'predict_year': '2010-1-1'},
     {"start_year": '2007-1-1', "end_year": '2010-1-1', 'predict_year': '2011-1-1'},
+    {"start_year": '2008-1-1', "end_year": '2011-1-1', 'predict_year': '2012-1-1'},
     {"start_year": '2009-1-1', "end_year": '2012-1-1', 'predict_year': '2013-1-1'},
-    {"start_year":'2008-1-1' , "end_year":'2011-1-1','predict_year': '2012-1-1'},
-    {"start_year":'2011-1-1' , "end_year":'2014-1-1','predict_year': '2015-1-1'},
-    {"start_year":'2012-1-1' , "end_year":'2015-1-1','predict_year': '2016-1-1'},
-    {"start_year":'2015-1-1' , "end_year":'2018-1-1','predict_year': '2019-1-1'},
-    {"start_year":'2014-1-1' , "end_year":'2017-1-1','predict_year': '2018-1-1'},
-    {"start_year":'2016-7-1' , "end_year":'2019-7-1','predict_year': '2020-7-1'}
+    {"start_year": '2011-1-1', "end_year": '2014-1-1', 'predict_year': '2015-1-1'},
+    {"start_year": '2012-1-1', "end_year": '2015-1-1', 'predict_year': '2016-1-1'},
+    {"start_year": '2014-1-1', "end_year": '2017-1-1', 'predict_year': '2018-1-1'},
+    {"start_year": '2015-1-1', "end_year": '2018-1-1', 'predict_year': '2019-1-1'},
+    {"start_year": '2016-7-1', "end_year": '2019-7-1', 'predict_year': '2020-7-1'}
 ]
 
 periods_stocks_prices = {}
@@ -169,7 +169,7 @@ for period in test_periods:
                     wrap=True)
 
     # plt.show()
-    # print(periods_stocks)
+    # print(periods_stocks_prices)
     # print(periods_portfolios)
 
     """
@@ -197,9 +197,10 @@ def returnsDiffrence(selected, portfolio, periods_stocks_prices):
 
     real_profit = 0.0
     for stock in selected:
-        real_profit = real_profit + ( portfolio[stock + " Weight"] * periods_stocks_prices[stock]['difference']- portfolio[stock + " Weight"] )
+        real_profit = real_profit + (
+                    portfolio[stock + " Weight"] * periods_stocks_prices[stock]['difference'] - portfolio[
+                stock + " Weight"])
     return returns - real_profit
-
 
 
 # find the  prices diff from the beginning of a period and the end
@@ -219,7 +220,8 @@ for period in periods_stocks_prices:
 """
 index = periods_stocks_prices.keys()
 columns = ['max_returns', 'safest', 'sharp']
-df_ = pd.DataFrame(index=index, columns=columns)
+idx = pd.Index(index, name='Dates')
+df_ = pd.DataFrame(index=idx, columns=columns)
 df_ = df_.fillna(0.0)  # with 0s rather than NaNs
 
 # get periods
@@ -230,18 +232,64 @@ for period_key in index:
         row = df_.loc[period_key]
         row[portfolio] = returnsDiffrence(selected, period_info[portfolio], periods_stocks_prices[period_key])
 
+# plt.show()
+
+
+
 """
 #################
 Results analysis 
 #################
 """
-
+# have to use abs before calc the mean and std
 print(df_)
-print("mean safest: " + str(df_["safest"].mean()))
-print("std safest: " + str(df_["safest"].std()))
+print("mean safest: " + str(df_["safest"].abs().mean()))
+print("std safest: " + str(df_["safest"].abs().std()))
 
-print("mean sharp: " + str(df_["sharp"].mean()))
-print("std sharp: " + str(df_["sharp"].std()))
+print("mean sharp: " + str(df_["sharp"].abs().mean()))
+print("std sharp: " + str(df_["sharp"].abs().std()))
 
-print("mean max_returns: " + str(df_["max_returns"].mean()))
-print("std max_returns: " + str(df_["max_returns"].std()))
+print("mean max_returns: " + str(df_["max_returns"].abs().mean()))
+print("std max_returns: " + str(df_["max_returns"].abs().std()))
+
+
+# plot analyst graph
+
+from matplotlib import style
+
+# plt.clf()
+
+#first graph
+# style.use('ggplot')
+# # df_.plot( y=columns, kind="line")
+# df_['max_returns'].plot(ls='-.')
+# df_['safest'].plot(ls='-')
+# df_['sharp'].plot(ls=':')
+# plt.legend(loc=4)
+# plt.xlabel('Learning Period Portfolio Dates', fontsize=14)
+# plt.ylabel('Percentage(%)Diff', fontsize=14)
+# plt.grid(axis='x', color='0.95')
+# plt.legend(title='Portfolio Type:')
+# plt.title('Returns Differences by Stock Portfolio Type', fontsize=18)
+
+
+
+# mean graph
+
+# plt.clf()
+# df_.abs().mean().plot(kind='bar', hatch= '/' , color='green')
+# plt.xlabel('Portfolio Type', fontsize=14)
+# plt.ylabel('Mean Percentage(%)Diff', fontsize=14)
+# plt.grid(axis='x', color='0.95')
+# plt.title('Returns Differences by Stock Portfolio Type', fontsize=18)
+# plt.show()
+
+# std graph
+# plt.clf()
+# df_.abs().std().plot(kind='bar', hatch= '+' , color='blue')
+# plt.xlabel('Portfolio Type', fontsize=14)
+# plt.ylabel('Std Percentage(%)Diff', fontsize=14)
+# plt.grid(axis='x', color='0.95')
+# plt.title('Returns Differences by Stock Portfolio Type', fontsize=18)
+
+# plt.show()
