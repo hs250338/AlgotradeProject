@@ -288,7 +288,7 @@ plt.show()
 # mean graph
 
 plt.clf()
-df_.abs().mean().plot(kind='bar', hatch= '/' , color='green')
+df_.mean().plot(kind='bar', hatch= '/' , color='green')
 plt.xlabel('Portfolio Type', fontsize=14)
 plt.ylabel('Mean Percentage(%)Diff', fontsize=14)
 plt.grid(axis='x', color='0.95')
@@ -297,7 +297,7 @@ plt.show()
 
 # std graph
 plt.clf()
-df_.abs().std().plot(kind='bar', hatch= '+' , color='blue')
+df_.std().plot(kind='bar', hatch= '+' , color='blue')
 plt.xlabel('Portfolio Type', fontsize=14)
 plt.ylabel('Std Percentage(%)Diff', fontsize=14)
 plt.grid(axis='x', color='0.95')
