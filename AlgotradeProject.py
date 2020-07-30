@@ -20,15 +20,29 @@ import matplotlib.pyplot as plt
 
 test_periods = [
     {"start_year": '2005-1-1', "end_year": '2008-1-1', 'predict_year': '2009-1-1'},
+    {"start_year": '2005-6-1', "end_year": '2008-6-1', 'predict_year': '2009-6-1'},
     {"start_year": '2006-1-1', "end_year": '2009-1-1', 'predict_year': '2010-1-1'},
+    {"start_year": '2006-6-1', "end_year": '2009-6-1', 'predict_year': '2010-6-1'},
     {"start_year": '2007-1-1', "end_year": '2010-1-1', 'predict_year': '2011-1-1'},
+    {"start_year": '2007-6-1', "end_year": '2010-6-1', 'predict_year': '2011-6-1'},
     {"start_year": '2008-1-1', "end_year": '2011-1-1', 'predict_year': '2012-1-1'},
+    {"start_year": '2008-6-1', "end_year": '2011-6-1', 'predict_year': '2012-6-1'},
     {"start_year": '2009-1-1', "end_year": '2012-1-1', 'predict_year': '2013-1-1'},
+    {"start_year": '2009-6-1', "end_year": '2012-6-1', 'predict_year': '2013-6-1'},
+    {"start_year": '2010-1-1', "end_year": '2013-1-1', 'predict_year': '2014-1-1'},
+    {"start_year": '2010-6-1', "end_year": '2013-6-1', 'predict_year': '2014-6-1'},
     {"start_year": '2011-1-1', "end_year": '2014-1-1', 'predict_year': '2015-1-1'},
+    {"start_year": '2011-6-1', "end_year": '2014-6-1', 'predict_year': '2015-6-1'},
     {"start_year": '2012-1-1', "end_year": '2015-1-1', 'predict_year': '2016-1-1'},
+    {"start_year": '2012-6-1', "end_year": '2015-6-1', 'predict_year': '2016-6-1'},
+    {"start_year": '2013-1-1', "end_year": '2016-1-1', 'predict_year': '2017-1-1'},
+    {"start_year": '2013-6-1', "end_year": '2016-6-1', 'predict_year': '2017-6-1'},
     {"start_year": '2014-1-1', "end_year": '2017-1-1', 'predict_year': '2018-1-1'},
+    {"start_year": '2014-6-1', "end_year": '2017-6-1', 'predict_year': '2018-6-1'},
     {"start_year": '2015-1-1', "end_year": '2018-1-1', 'predict_year': '2019-1-1'},
-    {"start_year": '2016-7-1', "end_year": '2019-7-1', 'predict_year': '2020-7-1'}
+    {"start_year": '2015-6-1', "end_year": '2018-6-1', 'predict_year': '2019-6-1'},
+    {"start_year": '2016-6-1', "end_year": '2019-6-1', 'predict_year': '2020-6-1'},
+    {"start_year": '2016-1-1', "end_year": '2019-1-1', 'predict_year': '2020-1-1'}
 ]
 
 periods_stocks_prices = {}
@@ -56,7 +70,7 @@ for period in test_periods:
         # get the price of each stock at the end of the tested period and one year after
         predict_price = pdr.get_data_yahoo(stock, end_year, prediction_year)['Adj Close']
         stocks_prices[stock] = {'start_val': predict_price[0], 'end_val': predict_price[len(predict_price) - 1]}
-    periods_stocks_prices[period['start_year'] + '->' + period['end_year']] = stocks_prices
+    periods_stocks_prices[period['predict_year']] = stocks_prices
     # End Insert Adj Close To DataBase
 
     import pandas as pd
@@ -131,18 +145,18 @@ for period in test_periods:
     max_vols = df.loc[df['Volatility'] == max_vol]
 
     # plot frontier, max sharpe & min Volatility values with a scatterplot
-    plt.style.use('seaborn-dark')
-    df.plot.scatter(x='Volatility', y='Returns', c='Sharpe Ratio',
-                    cmap='RdYlGn', edgecolors='black', figsize=(10, 8), grid=True)
-    plt.scatter(x=sharpe_portfolio['Volatility'], y=sharpe_portfolio['Returns'], c='green', marker='D', s=200)
-    plt.scatter(x=min_variance_port['Volatility'], y=min_variance_port['Returns'], c='orange', marker='D', s=200)
-    plt.scatter(x=max_vols['Volatility'], y=max_returns['Returns'], c='red', marker='D', s=200)
-    plt.style.use('seaborn-dark')
-
-    plt.xlabel('Volatility (Std. Deviation) Percentage %')
-    plt.ylabel('Expected Returns Percentage %')
-    plt.title(period['start_year'] + '->' + period['end_year'])
-    plt.subplots_adjust(bottom=0.4)
+    # plt.style.use('seaborn-dark')
+    # df.plot.scatter(x='Volatility', y='Returns', c='Sharpe Ratio',
+    #                 cmap='RdYlGn', edgecolors='black', figsize=(10, 8), grid=True)
+    # plt.scatter(x=sharpe_portfolio['Volatility'], y=sharpe_portfolio['Returns'], c='green', marker='D', s=200)
+    # plt.scatter(x=min_variance_port['Volatility'], y=min_variance_port['Returns'], c='orange', marker='D', s=200)
+    # plt.scatter(x=max_vols['Volatility'], y=max_returns['Returns'], c='red', marker='D', s=200)
+    # plt.style.use('seaborn-dark')
+    #
+    # plt.xlabel('Volatility (Std. Deviation) Percentage %')
+    # plt.ylabel('Expected Returns Percentage %')
+    # plt.title(period['send_year'])
+    # plt.subplots_adjust(bottom=0.4)
     # ------------------ Pritning 3 optimal Protfolios -----------------------
     # Setting max_X, max_Y to act as relative border for window size
 
@@ -154,19 +168,19 @@ for period in test_periods:
 
     with pd.option_context('display.float_format', '%{:,.2f}'.format):
         # keep for each period of prediction all the three portfolios data
-        periods_portfolios[period['start_year'] + '->' + period['end_year']] = {
+        periods_portfolios[period['predict_year']] = {
             'max_returns': df.loc[red_num[0]].multiply(multseries),
             'safest': df.loc[yellow_num[0]].multiply(multseries),
             'sharp': df.loc[green_num[0]].multiply(multseries)}
-        plt.figtext(0.2, 0.15, "Max returns Porfolio: \n" + df.loc[red_num[0]].multiply(multseries).to_string(),
-                    bbox=dict(facecolor='red', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
-                    wrap=True)
-        plt.figtext(0.45, 0.15, "Safest Portfolio: \n" + df.loc[yellow_num[0]].multiply(multseries).to_string(),
-                    bbox=dict(facecolor='yellow', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
-                    wrap=True)
-        plt.figtext(0.7, 0.15, "Sharpe  Portfolio: \n" + df.loc[green_num[0]].multiply(multseries).to_string(),
-                    bbox=dict(facecolor='green', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
-                    wrap=True)
+        # plt.figtext(0.2, 0.15, "Max returns Porfolio: \n" + df.loc[red_num[0]].multiply(multseries).to_string(),
+        #             bbox=dict(facecolor='red', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
+        #             wrap=True)
+        # plt.figtext(0.45, 0.15, "Safest Portfolio: \n" + df.loc[yellow_num[0]].multiply(multseries).to_string(),
+        #             bbox=dict(facecolor='yellow', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
+        #             wrap=True)
+        # plt.figtext(0.7, 0.15, "Sharpe  Portfolio: \n" + df.loc[green_num[0]].multiply(multseries).to_string(),
+        #             bbox=dict(facecolor='green', alpha=0.5), fontsize=11, style='oblique', ha='center', va='center',
+        #             wrap=True)
 
     # plt.show()
     # print(periods_stocks_prices)
@@ -198,8 +212,8 @@ def returnsDiffrence(selected, portfolio, periods_stocks_prices):
     real_profit = 0.0
     for stock in selected:
         real_profit = real_profit + (
-                    portfolio[stock + " Weight"] * periods_stocks_prices[stock]['difference'] - portfolio[
-                stock + " Weight"])
+                portfolio[stock + " Weight"] * periods_stocks_prices[stock]['difference'] - portfolio[
+            stock + " Weight"])
     return returns - real_profit
 
 
@@ -235,7 +249,6 @@ for period_key in index:
 # plt.show()
 
 
-
 """
 #################
 Results analysis 
@@ -243,53 +256,51 @@ Results analysis
 """
 # have to use abs before calc the mean and std
 print(df_)
-print("mean safest: " + str(df_["safest"].abs().mean()))
-print("std safest: " + str(df_["safest"].abs().std()))
+print("mean safest: " + str(df_["safest"].mean()))
+print("std safest: " + str(df_["safest"].std()))
 
-print("mean sharp: " + str(df_["sharp"].abs().mean()))
-print("std sharp: " + str(df_["sharp"].abs().std()))
+print("mean sharp: " + str(df_["sharp"].mean()))
+print("std sharp: " + str(df_["sharp"].std()))
 
-print("mean max_returns: " + str(df_["max_returns"].abs().mean()))
-print("std max_returns: " + str(df_["max_returns"].abs().std()))
-
+print("mean max_returns: " + str(df_["max_returns"].mean()))
+print("std max_returns: " + str(df_["max_returns"].std()))
 
 # plot analyst graph
 
 from matplotlib import style
 
-# plt.clf()
+plt.clf()
 
 #first graph
-# style.use('ggplot')
-# # df_.plot( y=columns, kind="line")
-# df_['max_returns'].plot(ls='-.')
-# df_['safest'].plot(ls='-')
-# df_['sharp'].plot(ls=':')
-# plt.legend(loc=4)
-# plt.xlabel('Learning Period Portfolio Dates', fontsize=14)
-# plt.ylabel('Percentage(%)Diff', fontsize=14)
-# plt.grid(axis='x', color='0.95')
-# plt.legend(title='Portfolio Type:')
-# plt.title('Returns Differences by Stock Portfolio Type', fontsize=18)
-
-
+style.use('ggplot')
+# df_.plot( y=columns, kind="line")
+df_['max_returns'].plot(ls='-.')
+df_['safest'].plot(ls='-')
+df_['sharp'].plot(ls=':')
+plt.legend(loc=4)
+plt.xlabel('Test Prediction Date of the Learning Period', fontsize=14)
+plt.ylabel('Percentage(%)Diff', fontsize=14)
+plt.grid(axis='x', color='0.95')
+plt.legend(title='Portfolio Type:')
+plt.title('Returns Differences by Stock Portfolio Type', fontsize=18)
+plt.show()
 
 # mean graph
 
-# plt.clf()
-# df_.abs().mean().plot(kind='bar', hatch= '/' , color='green')
-# plt.xlabel('Portfolio Type', fontsize=14)
-# plt.ylabel('Mean Percentage(%)Diff', fontsize=14)
-# plt.grid(axis='x', color='0.95')
-# plt.title('Returns Differences by Stock Portfolio Type', fontsize=18)
-# plt.show()
+plt.clf()
+df_.abs().mean().plot(kind='bar', hatch= '/' , color='green')
+plt.xlabel('Portfolio Type', fontsize=14)
+plt.ylabel('Mean Percentage(%)Diff', fontsize=14)
+plt.grid(axis='x', color='0.95')
+plt.title('Returns Differences by Stock Portfolio Type', fontsize=18)
+plt.show()
 
 # std graph
-# plt.clf()
-# df_.abs().std().plot(kind='bar', hatch= '+' , color='blue')
-# plt.xlabel('Portfolio Type', fontsize=14)
-# plt.ylabel('Std Percentage(%)Diff', fontsize=14)
-# plt.grid(axis='x', color='0.95')
-# plt.title('Returns Differences by Stock Portfolio Type', fontsize=18)
+plt.clf()
+df_.abs().std().plot(kind='bar', hatch= '+' , color='blue')
+plt.xlabel('Portfolio Type', fontsize=14)
+plt.ylabel('Std Percentage(%)Diff', fontsize=14)
+plt.grid(axis='x', color='0.95')
+plt.title('Returns Differences by Stock Portfolio Type', fontsize=18)
 
-# plt.show()
+plt.show()
